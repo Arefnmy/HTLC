@@ -10,14 +10,14 @@ class HTLC:
                       '{endtime} OP_CHECKLOCKTIMEVERIFY OP_DROP OP_DUP OP_HASH160 {sender_address_hash}' \
                       ' OP_EQUALVERIFY OP_CHECKSIG OP_ENDIF'
 
-    def __init__(self, network: str, secret: Secret, sender_address, recipient_address, end_time: int):
+    def __init__(self, network: str, secret_hash, sender_address, recipient_address, end_time: int):
         self.network = network
-        self.secret = secret
+        self.secret_hash = secret_hash
         self.sender_address = sender_address
         self.recipient_address = recipient_address
         self.end_time = end_time
 
-        self.script = Script(HTLC.script_template.format(secret_hash=secret.secret_hash_hex(),
+        self.script = Script(HTLC.script_template.format(secret_hash=secret_hash,
                                                          recipient_address_hash=self.recipient_address.to_hash160(),
                                                          endtime=str(end_time),
                                                          sender_address_hash=self.sender_address.to_hash160()).split())
