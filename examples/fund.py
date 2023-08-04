@@ -16,7 +16,7 @@ TXOUT_INDEX = 0
 AMOUNT = 0.09
 
 alice_secret = Secret.from_string('Alice Secret')
-alice_htlc = HTLC('testnet', alice_secret.secret_hash_hex(),
+alice_htlc = HTLC('btc-test', alice_secret.secret_hash_hex(),
                   ALICE.address, BOB.address, END_TIME)
 
 txin = TxInput(TX_ID, TXOUT_INDEX)
@@ -28,3 +28,4 @@ sig = ALICE.private_key.sign_input(tx, 0, ALICE.address.to_script_pub_key())
 txin.script_sig = Script([sig, ALICE.public_key.to_hex()])
 
 print(tx.get_txid())
+print(tx)
