@@ -1,5 +1,8 @@
-from bitcoinutils.script import Script
-from bitcoinutils.transactions import TxOutput
+from binascii import unhexlify
+from bitcoinutils.script import Script as BTC_Script
+from litecoinutils.script import Script as LTC_Scipt
+from bitcoinutils.transactions import TxOutput as BTC_TxOutput
+from litecoinutils.transactions import TxOutput as LTC_TxOutput
 
 from secret import Secret
 
@@ -17,16 +20,51 @@ class HTLC:
         self.recipient_address = recipient_address
         self.end_time = end_time
 
-        self.script = Script(HTLC.script_template.format(secret_hash=secret_hash,
-                                                         recipient_address_hash=self.recipient_address.to_hash160(),
-                                                         endtime=str(end_time),
-                                                         sender_address_hash=self.sender_address.to_hash160()).split())
+        # implement in separate classes
+        if network == 'btc-test':
+            self.script = BTC_Script(HTLC.script_template.format(secret_hash=secret_hash,
+                                                                 recipient_address_hash=self.recipient_address.to_hash160(),
+                                                                 endtime=str(end_time),
+                                                                 sender_address_hash=self.sender_address.to_hash160()).split())
+        elif network == 'ltc-test':
+            self.script = LTC_Scipt(HTLC.script_template.format(secret_hash=secret_hash,
+                                                                recipient_address_hash=self.recipient_address.to_hash160(),
+                                                                endtime=str(end_time),
+                                                                sender_address_hash=self.sender_address.to_hash160()).split())
 
     def build_fund_utxo(self, amount):
-        txout = TxOutput(amount, self.script.to_p2sh_script_pub_key())
-        return txout
+        if self.network == 'btc-test':
+            return BTC_TxOutput(amount, self.script.to_p2sh_script_pub_key())
+        elif self.network == 'ltc-test':
+            return LTC_TxOutput(amount, self.script.to_p2sh_script_pub_key())
+        else:
+            raise NotImplemented
 
-    # def sign_refund_tx(self, tx, txin_index, private_key):
-    #     sig = private_key.sign_input(tx, 0, self.script)
-    #     tx.inputs[0].script_sig = Script([sig, self.script.to_hex()])
-    #     return tx
+    def build_withdraw_utxo(self):
+        raise NotImplemented
+
+
+class Swap:
+
+    def __init__(self, first_htlc: HTLC, second_htlc: HTLC):
+        self.first_htlc = first_htlc
+        self.second_htlc = second_htlc
+
+    def evaluate(self, origin_time=None):
+        if self.first_htlc.secret_hash != self.second_htlc.secret_hash:
+            return False
+
+        # check first duration >= 2* second duration
+        # from datetime import datetime
+        # now = datetime.now().timestamp()
+
+        return self.first_htlc.end_time > self.second_htlc.end_time
+
+    @staticmethod
+    def extract_secret(tx, secret_hash: str, network=None):
+        txin = tx.inputs[0]  # TODO
+        secret_hash_pushed = txin.script_sig.get_script()[2]  # TODO
+        secret_pushed = Secret(unhexlify(secret_hash_pushed))
+        if secret_pushed.secret_hash_hex() != secret_hash:
+            raise ValueError('Secret Hash is invalid!')
+
