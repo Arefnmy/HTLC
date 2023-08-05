@@ -59,6 +59,7 @@ class Swap:
 
         return self.first_htlc.end_time >= self.second_htlc.end_time + 24 * 3600  # 24 hours
 
+    # move methods to utils
     @staticmethod
     def extract_secret_hash(tx, network=None):
         pass
@@ -66,7 +67,7 @@ class Swap:
     @staticmethod
     def extract_secret(tx, secret_hash: str, network=None):  # tx hash
         txin = tx.inputs[0]  # TODO
-        secret_pushed_hex = txin.script_sig.get_script()[0]  # TODO
+        secret_pushed_hex = txin.script_sig.get_script()[2]  # TODO
         secret_pushed = Secret.from_hex(secret_pushed_hex)
         if secret_pushed.secret_hash_hex() != secret_hash:
             raise ValueError('Secret Hash is invalid!')
