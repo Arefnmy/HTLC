@@ -11,6 +11,7 @@ UTXO_INDEX = 0
 AMOUNT = 0.09
 END_TIME = 1691151553
 ALICE_SECRET = Secret.from_string('Alice Secret')
+print(ALICE_SECRET.secret_hex())
 
 alice_htlc = HTLC('btc-test', ALICE_SECRET.secret_hash_hex(),
                   ALICE.address, BOB.address, END_TIME)
@@ -21,7 +22,7 @@ txout = TxOutput(to_satoshis(AMOUNT), ALICE.address.to_script_pub_key())
 tx = Transaction([txin], [txout])
 
 sig = ALICE.private_key.sign_input(tx, 0, alice_htlc.script)
-txin.script_sig = Script([sig, alice_htlc.script.to_hex()])  # TODO
+txin.script_sig = Script([ALICE.public_key.to_hex(), sig, alice_htlc.script.to_hex()])  # TODO
 
 print(tx.get_txid())
 print(tx)
