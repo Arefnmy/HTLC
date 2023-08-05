@@ -1,4 +1,5 @@
-import hashlib
+from hashlib import sha256
+from binascii import unhexlify
 
 
 class Secret:
@@ -8,10 +9,14 @@ class Secret:
 
     @classmethod
     def from_string(cls, s):
-        return cls(hashlib.sha256(s.encode()).digest())
+        return cls(sha256(s.encode()).digest())
+
+    @classmethod
+    def from_hex(cls, s):
+        return cls(unhexlify(s))
 
     def secret_hex(self):
         return self.sec.hex()
 
     def secret_hash_hex(self):
-        return hashlib.sha256(self.sec).hexdigest()
+        return sha256(self.sec).hexdigest()
