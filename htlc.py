@@ -1,4 +1,3 @@
-from binascii import unhexlify
 from bitcoinutils.script import Script as BTC_Script
 from litecoinutils.script import Script as LTC_Scipt
 from bitcoinutils.transactions import TxOutput as BTC_TxOutput
@@ -58,13 +57,17 @@ class Swap:
         # from datetime import datetime
         # now = datetime.now().timestamp()
 
-        return self.first_htlc.end_time > self.second_htlc.end_time
+        return self.first_htlc.end_time >= self.second_htlc.end_time + 24 * 3600  # 24 hours
 
     @staticmethod
-    def extract_secret(tx, secret_hash: str, network=None):
+    def extract_secret_hash(tx, network=None):
+        pass
+
+    @staticmethod
+    def extract_secret(tx, secret_hash: str, network=None):  # tx hash
         txin = tx.inputs[0]  # TODO
-        secret_hash_pushed = txin.script_sig.get_script()[2]  # TODO
-        secret_pushed = Secret(unhexlify(secret_hash_pushed))
+        secret_pushed_hex = txin.script_sig.get_script()[0]  # TODO
+        secret_pushed = Secret.from_hex(secret_pushed_hex)
         if secret_pushed.secret_hash_hex() != secret_hash:
             raise ValueError('Secret Hash is invalid!')
-
+        return secret_pushed
