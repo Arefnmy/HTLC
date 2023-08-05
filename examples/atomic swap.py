@@ -64,7 +64,7 @@ print(alice_withdraw_tx)
 
 # Carol creates withdraw trx on BTC
 
-secret = Swap.extract_secret(alice_tx, alice_htlc.secret_hash)
+secret = Swap.extract_secret(alice_withdraw_tx, alice_htlc.secret_hash)
 
 txin = BTC_TxInput(alice_tx.get_txid(), 0)
 txout = BTC_TxOutput(BTC_to_satoshis(AMOUNT_BTC), CAROL.address.to_script_pub_key())
@@ -74,3 +74,4 @@ carol_withdraw_trx = BTC_Transaction([txin], [txout])
 sig = CAROL.private_key.sign_input(carol_withdraw_trx, 0, alice_htlc.script)
 txin.script_sig = BTC_Script([secret.secret_hex(), secret.secret_hex(), CAROL.public_key.to_hex(),
                               sig] + alice_htlc.script.script)
+print(carol_withdraw_trx)
