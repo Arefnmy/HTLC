@@ -58,8 +58,8 @@ txout = LTC_TxOutput(LTC_to_satoshis(AMOUNT_LTC), ALICE.address.to_script_pub_ke
 alice_withdraw_tx = LTC_Transaction([txin], [txout])
 
 sig = ALICE.private_key.sign_input(alice_withdraw_tx, 0, carol_htlc.script)
-txin.script_sig = LTC_Script([alice_secret.secret_hex(), alice_secret.secret_hex(), ALICE.public_key.to_hex(),
-                              sig] + carol_htlc.script.script)
+txin.script_sig = LTC_Script([sig, ALICE.public_key.to_hex(), alice_secret.secret_hex(), b'']
+                             + carol_htlc.script.script)
 print(alice_withdraw_tx)
 
 # Carol creates withdraw trx on BTC
@@ -72,6 +72,6 @@ txout = BTC_TxOutput(BTC_to_satoshis(AMOUNT_BTC), CAROL.address.to_script_pub_ke
 carol_withdraw_trx = BTC_Transaction([txin], [txout])
 
 sig = CAROL.private_key.sign_input(carol_withdraw_trx, 0, alice_htlc.script)
-txin.script_sig = BTC_Script([secret.secret_hex(), secret.secret_hex(), CAROL.public_key.to_hex(),
-                              sig] + alice_htlc.script.script)
+txin.script_sig = BTC_Script([sig, CAROL.public_key.to_hex(), secret.secret_hex(), b'']
+                             + alice_htlc.script.script)
 print(carol_withdraw_trx)
