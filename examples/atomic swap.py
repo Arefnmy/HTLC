@@ -35,7 +35,7 @@ TX_ID_LTC = 'fb48f4e23bf6ddf606714141ac78c3e921c8c0bebeb7c8abb2c799e9ff96ce6c'
 TXOUT_INDEX_LTC = 0
 AMOUNT_LTC = 1.0
 
-carol_htlc = HTLC('ltc-test', alice_htlc.secret_hash,
+carol_htlc = HTLC('ltc-test', alice_htlc.secret_hash,  # get from HTLC.extract_secret_hash()
                   CAROL.address, ALICE.address, CROL_END_TIME_HTLC)
 
 txin_ltc = LTC_TxInput(TX_ID_LTC, TXOUT_INDEX_LTC)
@@ -49,3 +49,28 @@ txin_ltc.script_sig = LTC_Script([carol_sig, CAROL.public_key.to_hex()])
 # create swap instance
 swap = Swap(alice_htlc, carol_htlc)
 print(swap.evaluate())
+
+# Alice creates withdraw trx on LTC
+
+txin = LTC_TxInput(carol_tx.get_txid(), 0)
+txout = LTC_TxOutput(LTC_to_satoshis(AMOUNT_LTC), ALICE.address.to_script_pub_key())
+
+alice_withdraw_tx = LTC_Transaction([txin], [txout])
+
+sig = ALICE.private_key.sign_input(alice_withdraw_tx, 0, carol_htlc.script)
+txin.script_sig = LTC_Script([alice_secret.secret_hex(), alice_secret.secret_hex(), ALICE.public_key.to_hex(),
+                              sig] + carol_htlc.script.script)
+print(alice_withdraw_tx)
+
+# Carol creates withdraw trx on BTC
+
+secret = Swap.extract_secret(alice_tx, alice_htlc.secret_hash)
+
+txin = BTC_TxInput(alice_tx.get_txid(), 0)
+txout = BTC_TxOutput(BTC_to_satoshis(AMOUNT_BTC), CAROL.address.to_script_pub_key())
+
+carol_withdraw_trx = BTC_Transaction([txin], [txout])
+
+sig = CAROL.private_key.sign_input(carol_withdraw_trx, 0, alice_htlc.script)
+txin.script_sig = BTC_Script([secret.secret_hex(), secret.secret_hex(), CAROL.public_key.to_hex(),
+                              sig] + alice_htlc.script.script)
