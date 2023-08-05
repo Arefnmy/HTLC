@@ -21,8 +21,7 @@ txout = TxOutput(to_satoshis(AMOUNT), BOB.address.to_script_pub_key())
 tx = Transaction([txin], [txout])
 
 sig = BOB.private_key.sign_input(tx, 0, htlc.script)
-txin.script_sig = Script([SECRET.secret_hex(), SECRET.secret_hex(), BOB.public_key.to_hex(),
-                          sig, htlc.script.to_hex()])  # TODO
-
+txin.script_sig = Script([sig,  BOB.public_key.to_hex(), SECRET.secret_hex(), b'']
+                         + htlc.script.script)
 print(tx.get_txid())
 print(tx)
