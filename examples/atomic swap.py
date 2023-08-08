@@ -68,7 +68,7 @@ alice_withdraw_tx = LTC_Transaction([txin], [txout])
 
 sig = ALICE.private_key.sign_input(alice_withdraw_tx, 0, carol_htlc.script)  # Alice has redeem_script to unlock
 txin.script_sig = LTC_Script(build_withdraw_script(sig, ALICE.public_key.to_hex(), alice_secret.secret_hex(),
-                                                   carol_htlc.script.script))
+                                                   carol_htlc.script))
 print('Alice Withdraw Transaction ID : ', alice_withdraw_tx.get_txid())
 print('Alice Withdraw Transaction : \n', alice_withdraw_tx)
 
@@ -84,6 +84,6 @@ carol_withdraw_trx = BTC_Transaction([txin], [txout])
 
 sig = CAROL.private_key.sign_input(carol_withdraw_trx, 0, alice_htlc.script)
 txin.script_sig = BTC_Script(build_withdraw_script(sig, CAROL.public_key.to_hex(), secret.secret_hex(),
-                                                   alice_htlc.script.script))
+                                                   alice_htlc.script))
 print('Carol Withdraw Transaction ID : ', carol_withdraw_trx.get_txid())
 print('Carol Withdraw Transaction : \n', carol_withdraw_trx)

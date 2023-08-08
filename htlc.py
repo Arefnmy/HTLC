@@ -19,12 +19,12 @@ class HTLC:
         if network == 'btc-test':
             self.script = BTC_Script(HTLC.script_template.format(secret_hash=secret_hash,
                                                                  recipient_address_hash=self.recipient_address.to_hash160(),
-                                                                 endtime=str(end_time),
+                                                                 endtime=hex(end_time)[2:],
                                                                  sender_address_hash=self.sender_address.to_hash160()).split())
         elif network == 'ltc-test':
             self.script = LTC_Script(HTLC.script_template.format(secret_hash=secret_hash,
                                                                  recipient_address_hash=self.recipient_address.to_hash160(),
-                                                                 endtime=str(end_time),
+                                                                 endtime=hex(end_time)[2:],
                                                                  sender_address_hash=self.sender_address.to_hash160()).split())
 
 

@@ -6,11 +6,11 @@ def build_fund_script(script):
 
 
 def build_refund_script(sig, public_key, redeem_script):
-    return [sig, public_key, '01'] + redeem_script
+    return [sig, public_key, b'', redeem_script.to_hex()]
 
 
 def build_withdraw_script(sig, public_key, secret, redeem_script):
-    return [sig, public_key, secret, b''] + redeem_script
+    return [sig, public_key, secret, b'01', redeem_script.to_hex()]
 
 
 def extract_secret(tx, secret_hash: str, network=None):  # extract from tx hash

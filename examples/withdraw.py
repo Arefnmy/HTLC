@@ -22,7 +22,7 @@ txout = TxOutput(to_satoshis(AMOUNT), BOB.address.to_script_pub_key())
 tx = Transaction([txin], [txout])
 
 sig = BOB.private_key.sign_input(tx, 0, htlc.script)
-txin.script_sig = Script(build_withdraw_script(sig, BOB.public_key.to_hex(), SECRET.secret_hex(), htlc.script.script))
+txin.script_sig = Script(build_withdraw_script(sig, BOB.public_key.to_hex(), SECRET.secret_hex(), htlc.script))
 
 print('Transaction ID : ', tx.get_txid())
 print(tx)

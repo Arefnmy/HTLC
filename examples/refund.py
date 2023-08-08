@@ -24,7 +24,7 @@ txout = TxOutput(to_satoshis(AMOUNT), ALICE.address.to_script_pub_key())
 tx = Transaction([txin], [txout])
 
 sig = ALICE.private_key.sign_input(tx, 0, alice_htlc.script)
-txin.script_sig = Script(build_refund_script(sig, ALICE.public_key.to_hex(), alice_htlc.script.script))
+txin.script_sig = Script(build_refund_script(sig, ALICE.public_key.to_hex(), alice_htlc.script))
 
 print('Transaction ID : ', tx.get_txid())
 print(tx)
