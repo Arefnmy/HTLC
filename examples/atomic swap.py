@@ -16,7 +16,7 @@ from utils import build_fund_script, extract_secret, build_withdraw_script
 ALICE_END_TIME_HTLC = int(datetime.now().timestamp()) + 3600 * 48  # 48 hours later
 TX_ID_BTC = '81bee81bbb08606c812e1fdda9e883fe72b2e73d3c723fc79c60906dc93e2b70'
 TXOUT_INDEX_BTC = 0
-AMOUNT_BTC = 0.09
+AMOUNT_BTC = 0.01
 
 alice_secret = Secret.from_string('Alice Secret')
 print('Alice Secret Hex : ', alice_secret.secret_hex())
@@ -39,7 +39,7 @@ print('Alice Fund Transaction : \n', alice_fund_tx)
 CAROL_END_TIME_HTLC = int(datetime.now().timestamp()) + 3600 * 24  # 24 hours later
 TX_ID_LTC = '03964e682cbf0998ecff4eb2ae203ffb5fdeeabe4eb7345c9e55aa9aad48687d'
 TXOUT_INDEX_LTC = 0
-AMOUNT_LTC = 1.0
+AMOUNT_LTC = 3.52
 
 carol_htlc = HTLC('ltc-test', alice_secret.secret_hash_hex(),  # Carol has alice secret
                   CAROL.address, ALICE.address, CAROL_END_TIME_HTLC)
