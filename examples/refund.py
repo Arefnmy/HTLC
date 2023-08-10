@@ -1,4 +1,3 @@
-from bitcoinutils.constants import DEFAULT_TX_SEQUENCE
 from bitcoinutils.script import Script
 from bitcoinutils.transactions import TxInput, TxOutput, Transaction
 from bitcoinutils.utils import to_satoshis
@@ -8,10 +7,10 @@ from htlc import HTLC
 from secret import Secret
 from utils import build_refund_script
 
-TX_ID = '5a5163b1ef126595c5f62931c029fecebbbdc65544006555f5dd4cd12c935af9'
+TX_ID = 'd6079f263cec46192f1f139de52229925c39e9eda814d67a1307058e10a06edd'
 UTXO_INDEX = 0
 AMOUNT = 0.09
-END_TIME = 1691662718
+END_TIME = 1691713271
 
 ALICE_SECRET = Secret.from_string('Alice Secret')
 print('Secret hex : ', ALICE_SECRET.secret_hex())

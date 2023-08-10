@@ -7,7 +7,7 @@ from htlc import HTLC
 from secret import Secret
 from utils import build_withdraw_script
 
-TX_ID = '0fe3eac00c2d0d5e112da1df779e3b5fd1bde91a8d2a16ba797d3ba6329393e2'
+TX_ID = 'd6079f263cec46192f1f139de52229925c39e9eda814d67a1307058e10a06edd'
 UTXO_INDEX = 0
 AMOUNT = 0.09
 END_TIME = 1691417604
