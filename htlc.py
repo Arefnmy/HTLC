@@ -1,3 +1,5 @@
+import json
+
 from bitcoinutils.script import Script as BTC_Script
 from litecoinutils.script import Script as LTC_Script
 
@@ -11,21 +13,35 @@ class HTLC:
     def __init__(self, network: str, secret_hash, sender_address, recipient_address, end_time: int):
         self.network = network
         self.secret_hash = secret_hash
-        self.sender_address = sender_address
-        self.recipient_address = recipient_address
+        self.sender_address = sender_address.to_string()
+        self.recipient_address = recipient_address.to_string()
         self.end_time = end_time
 
         # implement in separate classes
-        if network == 'btc-test':
+        if network == 'testnet':
             self.script = BTC_Script(HTLC.script_template.format(secret_hash=secret_hash,
-                                                                 recipient_address_hash=self.recipient_address.to_hash160(),
+                                                                 recipient_address_hash=recipient_address.to_hash160(),
                                                                  endtime=hex(end_time)[2:],
-                                                                 sender_address_hash=self.sender_address.to_hash160()).split())
-        elif network == 'ltc-test':
+                                                                 sender_address_hash=sender_address.to_hash160()).split())
+        elif network == 'litecoin_testnet':
             self.script = LTC_Script(HTLC.script_template.format(secret_hash=secret_hash,
-                                                                 recipient_address_hash=self.recipient_address.to_hash160(),
+                                                                 recipient_address_hash=recipient_address.to_hash160(),
                                                                  endtime=hex(end_time)[2:],
-                                                                 sender_address_hash=self.sender_address.to_hash160()).split())
+                                                                 sender_address_hash=sender_address.to_hash160()).split())
+        self.jsonify()
+
+    def jsonify(self):
+        dct = {
+            "network": self.network,
+            "secret hash": self.secret_hash,
+            "end time": self.end_time,
+            "sender address": self.sender_address,
+            "recipient address": self.recipient_address
+        }
+        j = json.dumps(dct, indent=4)
+        filename = "htlc.json"
+        with open(filename, "w") as json_file:
+            json_file.write(j)
 
 
 class Swap:
