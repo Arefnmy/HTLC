@@ -15,7 +15,7 @@ END_TIME = 1691713271
 ALICE_SECRET = Secret.from_string('Alice Secret')
 print('Secret hex : ', ALICE_SECRET.secret_hex())
 
-alice_htlc = HTLC('btc-test', ALICE_SECRET.secret_hash_hex(),
+alice_htlc = HTLC('testnet', ALICE_SECRET.secret_hash_hex(),
                   ALICE.address, BOB.address, END_TIME)
 # set nSequences and nLockTime based on bip0065
 txin = TxInput(TX_ID, UTXO_INDEX, sequence='fffffffe')

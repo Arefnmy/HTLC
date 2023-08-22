@@ -13,8 +13,8 @@ def build_withdraw_script(sig, public_key, secret, redeem_script):
     return [sig, public_key, secret, b'01', redeem_script.to_hex()]
 
 
-def extract_secret(tx, secret_hash: str, network=None):  # extract from tx hash
-    txin = tx.inputs[0]
+def extract_secret(tx, input_index, secret_hash: str):
+    txin = tx.inputs[input_index]
     secret_pushed_hex = txin.script_sig.get_script()[2]
     secret_pushed = Secret.from_hex(secret_pushed_hex)
     if secret_pushed.secret_hash_hex() != secret_hash:

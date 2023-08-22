@@ -8,6 +8,7 @@ from litecoinutils.transactions import TxInput as LTC_TxInput, Transaction as LT
 from litecoinutils.utils import to_satoshis as LTC_to_satoshis
 
 from htlc import HTLC, Swap
+from network import fetch_tx
 from participant import ALICE, CAROL
 from secret import Secret
 from utils import build_fund_script, extract_secret, build_withdraw_script
@@ -21,7 +22,7 @@ AMOUNT_BTC = 0.01
 alice_secret = Secret.from_string('Alice Secret')
 print('Alice Secret Hex : ', alice_secret.secret_hex())
 
-alice_htlc = HTLC('btc-test', alice_secret.secret_hash_hex(),
+alice_htlc = HTLC('testnet', alice_secret.secret_hash_hex(),
                   ALICE.address, CAROL.address, ALICE_END_TIME_HTLC)
 
 txin_btc = BTC_TxInput(TX_ID_BTC, TXOUT_INDEX_BTC)
@@ -41,7 +42,7 @@ TX_ID_LTC = '03964e682cbf0998ecff4eb2ae203ffb5fdeeabe4eb7345c9e55aa9aad48687d'
 TXOUT_INDEX_LTC = 0
 AMOUNT_LTC = 3.52
 
-carol_htlc = HTLC('ltc-test', alice_secret.secret_hash_hex(),  # Carol has alice secret
+carol_htlc = HTLC('litecoin_testnet', alice_secret.secret_hash_hex(),  # Carol has alice secret
                   CAROL.address, ALICE.address, CAROL_END_TIME_HTLC)
 
 txin_ltc = LTC_TxInput(TX_ID_LTC, TXOUT_INDEX_LTC)
@@ -73,8 +74,9 @@ print('Alice Withdraw Transaction ID : ', alice_withdraw_tx.get_txid())
 print('Alice Withdraw Transaction : \n', alice_withdraw_tx)
 
 # Carol creates withdraw trx on BTC
-
-secret = extract_secret(alice_withdraw_tx, alice_htlc.secret_hash)
+# fetch transaction with ID
+# trx = fetch_tx(alice_withdraw_tx.get_txid())
+secret = extract_secret(alice_withdraw_tx, 0, alice_htlc.secret_hash)
 print('Secret Hex Extracted : ', secret.secret_hex())
 
 txin = BTC_TxInput(alice_fund_tx.get_txid(), 0)  # Carol has Alice's fund transaction id

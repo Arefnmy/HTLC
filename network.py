@@ -10,9 +10,9 @@ FETCH_TX_URL = '/tx/{txid}/raw'
 def push_tx(tx_hex):
     response = requests.post(URL + PUSH_TX_URL, tx_hex)
     if response.status_code == 200:
-        return response.text
+        return 'Success: Transaction Hash: {response.text}'
     else:
-        return {"error": f"HTTP Error: {response.status_code}"}
+        return f'Error: HTTP Error: {response.status_code}'
 
 
 def fetch_tx(tx_id):

@@ -13,7 +13,7 @@ AMOUNT = 0.09
 END_TIME = 1691417604
 SECRET = Secret.from_hex('70b02494643d5084471db6ed484ef2332477ecaeb7d465b4fd1d096b11eb6da8')
 
-htlc = HTLC('btc-test', SECRET.secret_hash_hex(),
+htlc = HTLC('testnet', SECRET.secret_hash_hex(),
             ALICE.address, BOB.address, END_TIME)
 txin = TxInput(TX_ID, UTXO_INDEX)
 
