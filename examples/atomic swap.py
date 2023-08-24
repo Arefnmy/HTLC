@@ -8,7 +8,7 @@ from litecoinutils.transactions import TxInput as LTC_TxInput, Transaction as LT
 from litecoinutils.utils import to_satoshis as LTC_to_satoshis
 
 from htlc import HTLC, Swap
-from network import fetch_tx
+from network import fetch_tx, push_tx
 from participant import ALICE, CAROL
 from secret import Secret
 from utils import build_fund_script, extract_secret, build_withdraw_script
@@ -17,7 +17,7 @@ from utils import build_fund_script, extract_secret, build_withdraw_script
 ALICE_END_TIME_HTLC = int(datetime.now().timestamp()) + 3600 * 48  # 48 hours later
 TX_ID_BTC = '81bee81bbb08606c812e1fdda9e883fe72b2e73d3c723fc79c60906dc93e2b70'
 TXOUT_INDEX_BTC = 0
-AMOUNT_BTC = 0.01
+AMOUNT_BTC = 0.0003
 
 alice_secret = Secret.from_string('Alice Secret')
 print('Alice Secret Hex : ', alice_secret.secret_hex())
@@ -36,11 +36,14 @@ txin_btc.script_sig = BTC_Script([alice_sig, ALICE.public_key.to_hex()])
 print('Alice Fund Transaction ID : ', alice_fund_tx.get_txid())
 print('Alice Fund Transaction : \n', alice_fund_tx)
 
+response = push_tx(alice_fund_tx.serialize())
+print(response)
+
 # Carol creates HTLC on LTC
 CAROL_END_TIME_HTLC = int(datetime.now().timestamp()) + 3600 * 24  # 24 hours later
 TX_ID_LTC = '03964e682cbf0998ecff4eb2ae203ffb5fdeeabe4eb7345c9e55aa9aad48687d'
 TXOUT_INDEX_LTC = 0
-AMOUNT_LTC = 3.52
+AMOUNT_LTC = 0.09
 
 carol_htlc = HTLC('litecoin_testnet', alice_secret.secret_hash_hex(),  # Carol has alice secret
                   CAROL.address, ALICE.address, CAROL_END_TIME_HTLC)
@@ -56,12 +59,14 @@ txin_ltc.script_sig = LTC_Script([carol_sig, CAROL.public_key.to_hex()])
 print('Carol Fund Transaction ID : ', carol_fund_tx.get_txid())
 print('Carol Fund Transaction : \n', carol_fund_tx)
 
+response = push_tx(carol_fund_tx.serialize(), network='litecoin_testnet')
+print(response)
+
 # create swap instance
 swap = Swap(alice_htlc, carol_htlc)
 print('Swap terms are valid : ', swap.evaluate())
 
 # Alice creates withdraw trx on LTC
-
 txin = LTC_TxInput(carol_fund_tx.get_txid(), 0)  # Alice has Carol's fund transaction id
 txout = LTC_TxOutput(LTC_to_satoshis(AMOUNT_LTC), ALICE.address.to_script_pub_key())
 
@@ -73,9 +78,13 @@ txin.script_sig = LTC_Script(build_withdraw_script(sig, ALICE.public_key.to_hex(
 print('Alice Withdraw Transaction ID : ', alice_withdraw_tx.get_txid())
 print('Alice Withdraw Transaction : \n', alice_withdraw_tx)
 
+response = push_tx(alice_withdraw_tx.serialize())
+print(response)
+
 # Carol creates withdraw trx on BTC
+
 # fetch transaction with ID
-# trx = fetch_tx(alice_withdraw_tx.get_txid())
+fetched_tx = fetch_tx(alice_withdraw_tx.get_txid())
 secret = extract_secret(alice_withdraw_tx, 0, alice_htlc.secret_hash)
 print('Secret Hex Extracted : ', secret.secret_hex())
 
@@ -89,3 +98,6 @@ txin.script_sig = BTC_Script(build_withdraw_script(sig, CAROL.public_key.to_hex(
                                                    alice_htlc.script))
 print('Carol Withdraw Transaction ID : ', carol_withdraw_trx.get_txid())
 print('Carol Withdraw Transaction : \n', carol_withdraw_trx)
+
+response = push_tx(carol_withdraw_trx.serialize(), network='litecoin_testnet')
+print(response)
