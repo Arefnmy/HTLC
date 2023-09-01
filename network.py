@@ -7,15 +7,19 @@ PUSH_TX_URL = '/tx'
 FETCH_TX_URL = '/tx/{txid}/raw'
 
 
-def push_tx(tx_hex):
-    response = requests.post(URL + PUSH_TX_URL, tx_hex)
-    if response.status_code == 200:
-        return response.text
+def push_tx(tx_hex, network='testnet'):
+    if network == 'testnet':
+        url = URL + PUSH_TX_URL
     else:
-        return {"error": f"HTTP Error: {response.status_code}"}
+        raise NotImplemented
+    response = requests.post(url, tx_hex)
+    if response.status_code == 200:
+        return f'Success: Transaction ID: {response.text}'
+    else:
+        return response.text
 
 
-def fetch_tx(tx_id):
+def fetch_tx(tx_id, network='testnet'):
     response = requests.get(URL + FETCH_TX_URL.format(txid=tx_id))
     if response.status_code == 200:
         return Transaction.from_raw(response.content.hex())

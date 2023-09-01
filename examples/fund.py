@@ -1,34 +1,37 @@
 from datetime import datetime
 
-from bitcoinutils.script import Script
-from bitcoinutils.transactions import TxInput, Transaction, TxOutput
+from bitcoinutils.transactions import TxInput, Transaction, TxOutput, TxWitnessInput
 from bitcoinutils.utils import to_satoshis
 
+from network import push_tx
 from participant import ALICE, BOB
 from htlc import HTLC
 from secret import Secret
-from utils import build_fund_script
+from utils import build_fund_script, jsonify_htlc
 
 END_TIME = int(datetime.now().timestamp()) + 3600  # one hour later
 print('End Time : ', END_TIME)
-# TODO  update id
-TX_ID = 'fb48f4e23bf6ddf606714141ac78c3e921c8c0bebeb7c8abb2c799e9ff96ce6c'
-TXOUT_INDEX = 0
-AMOUNT = 0.00004
-# fee , change output
+
+TX_ID = 'e6e745ec4f09a97379bb714b622ce0cf7566b9a126f55de8c98f1446c06f9eb9'
+TXOUT_INDEX = 1
+AMOUNT = 0.00003
+
 alice_secret = Secret.from_string('Alice Secret')
-alice_htlc = HTLC('btc-test', alice_secret.secret_hash_hex(),
+alice_htlc = HTLC('testnet', alice_secret.secret_hash_hex(),
                   ALICE.address, BOB.address, END_TIME)
 
 txin = TxInput(TX_ID, TXOUT_INDEX)
+# remaining amounts are fee
 txout = TxOutput(to_satoshis(AMOUNT), build_fund_script(alice_htlc.script))
 
-tx = Transaction([txin], [txout])
+tx = Transaction([txin], [txout], has_segwit=True)
 
-sig = ALICE.private_key.sign_input(tx, 0, ALICE.address.to_script_pub_key())
-txin.script_sig = Script([sig, ALICE.public_key.to_hex()])
+sig = ALICE.private_key.sign_segwit_input(tx, 0, ALICE.address.to_script_pub_key(), to_satoshis(0.00004))
+tx.witnesses.append(TxWitnessInput([sig, ALICE.public_key.to_hex()]))
 
-print('Transaction ID : ', tx.get_txid())
-tx.serialize();
-print(tx.serialize())
-print(tx)
+jsonify_htlc(alice_htlc, tx.get_txid(), 'Alice_HTLC')
+print('Transaction : ', tx)
+print('Transaction Hex : ', tx.serialize())
+
+response = push_tx(tx.serialize())
+print(response)
