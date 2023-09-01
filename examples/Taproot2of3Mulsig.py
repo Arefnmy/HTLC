@@ -4,7 +4,7 @@ from bitcoinutils.script import Script
 from bitcoinutils.transactions import Transaction, TxInput, TxOutput, TxWitnessInput
 from bitcoinutils.keys import PrivateKey
 from bitcoinutils.hdwallet import HDWallet
-
+from test_framework.musig import generate_musig_key
 def main():
     setup('testnet')
 
@@ -51,22 +51,44 @@ def main():
     print('Send to Private key', to_priv.to_wif())
     to_pub = to_priv.get_public_key()
 
+
+
+
     privkey_tr_script_A = PrivateKey('cSW2kQbqC9zkqagw8oTYKFTozKuZ214zd6CMTDs4V32cMfH3dgKa')
     pubkey_tr_script_A = privkey_tr_script_A.get_public_key()
     privkey_tr_script_B = PrivateKey('cSv48xapaqy7fPs8VvoSnxNBNA2jpjcuURRqUENu3WVq6Eh4U3JU')
-    pubkey_tr_script_B = privkey_tr_script_B.get_public_key()
+    pubkey_tr_script_B = privkey_tr_script_B.get_public_key().get_byte()
     privkey_tr_script_C = PrivateKey('cRkZPNnn3jdr64o3PDxNHG68eowDfuCdcyL6nVL4n3czvunuvryC')
-    pubkey_tr_script_C = privkey_tr_script_C.get_public_key()
+    pubkey_tr_script_C = privkey_tr_script_C.get_public_key().get_byte()
+    pubkeys=[pubkey_tr_script_A, pubkey_tr_script_B]
+
+
+
+    c_map, pubkey_agg = generate_musig_key(pubkeys)
+    privkeyA_c = privkey_tr_script_A * c_map[pubkey_tr_script_A]
+    privkeyB_c = privkey_tr_script_B * c_map[pubkey_tr_script_B ]
+    pubkeyA_c = pubkey_tr_script_A * c_map[pubkey_tr_script_A]
+    pubkeyB_c = pubkey_tr_script_B * c_map[pubkey_tr_script_B]
+
+    # Determine if the private and public keys need to be negated.
+    # Hint: The aggregate public key is the one that needs to be valid.
+    if pubkey_agg.get_y() % 2 != 0:
+        privkeyA_c.negate()
+        privkeyB_c.negate()
+        pubkeyA_c.negate()
+        pubkeyB_c.negate()
+        pubkey_agg.negate()
+
+    print('ssssssssssssssssssssssssssssssssssssssss')
+    print(pubkey_agg.get_x())
     tr_script_p2pk_C_B = Script([pubkey_tr_script_C.to_x_only_hex(),'OP_CHECKSIGVERIFY',pubkey_tr_script_B.to_x_only_hex() , 'OP_CHECKSIG'])
     tr_script_p2pk_A_C = Script([pubkey_tr_script_C.to_x_only_hex(),'OP_CHECKSIGVERIFY',pubkey_tr_script_A.to_x_only_hex() , 'OP_CHECKSIG'])
-    tr_script_p2pk_B_A =Script([pubkey_tr_script_A.to_x_only_hex(),'OP_CHECKSIGVERIFY',pubkey_tr_script_B.to_x_only_hex() , 'OP_CHECKSIG'])
-
+    tr_script_p2pk_B_A =Script([pubkey_agg.get_x(), 'OP_CHECKSIG'])
 
     # tapleafs in order
     #                  TB_ABC
     #                  /     \
     #                 /       \
-    #
     #                /\        \
     #               /  \        \
     #              /    \        \
@@ -78,14 +100,14 @@ def main():
     print('To Taproot script address', to_address.to_string())
 
     # create transaction output
-    tx_out = TxOutput(to_satoshis(0.000035), to_address.to_script_pub_key())
+    tx_out = TxOutput(to_satoshis(0.0000035), to_address.to_script_pub_key())
 
     # create transaction without change output - if at least a single input is
     # segwit we need to set has_segwit=True
     tx = Transaction([tx_in], [tx_out], has_segwit=True)
 
-    print("\nRaw transaction:\n" + tx.serialize())
 
+    print("\nRaw transaction:\n" + tx.serialize())
     print('\ntxid: ' + tx.get_txid())
     print('\ntxwid: ' + tx.get_wtxid())
 
@@ -101,7 +123,6 @@ def main():
 
     print("\nTxId:", tx.get_txid())
     print("\nTxwId:", tx.get_wtxid())
-
     print("\nSize:", tx.get_size())
     print("\nvSize:", tx.get_vsize())
 

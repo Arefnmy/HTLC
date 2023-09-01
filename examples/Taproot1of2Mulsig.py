@@ -88,7 +88,6 @@ def main():
 
     # print raw signed transaction ready to be broadcasted
     print("\nRaw signed transaction:\n" + tx.serialize())
-
     print("\nTxId:", tx.get_txid())
     print("\nTxwId:", tx.get_wtxid())
     print("\nSize:", tx.get_size())
