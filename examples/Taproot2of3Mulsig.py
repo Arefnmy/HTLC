@@ -51,30 +51,27 @@ def main():
     print('Send to Private key', to_priv.to_wif())
     to_pub = to_priv.get_public_key()
 
-    # taproot script A is a simple P2PK with the following keys
     privkey_tr_script_A = PrivateKey('cSW2kQbqC9zkqagw8oTYKFTozKuZ214zd6CMTDs4V32cMfH3dgKa')
     pubkey_tr_script_A = privkey_tr_script_A.get_public_key()
-    tr_script_p2pk_A = Script([pubkey_tr_script_A.to_x_only_hex(), 'OP_CHECKSIG'])
-
-    # taproot script B is a simple P2PK with the following keys
     privkey_tr_script_B = PrivateKey('cSv48xapaqy7fPs8VvoSnxNBNA2jpjcuURRqUENu3WVq6Eh4U3JU')
     pubkey_tr_script_B = privkey_tr_script_B.get_public_key()
-    tr_script_p2pk_B = Script([pubkey_tr_script_B.to_x_only_hex(), 'OP_CHECKSIG'])
-
-    # taproot script C is a simple P2PK with the following keys
     privkey_tr_script_C = PrivateKey('cRkZPNnn3jdr64o3PDxNHG68eowDfuCdcyL6nVL4n3czvunuvryC')
     pubkey_tr_script_C = privkey_tr_script_C.get_public_key()
-    tr_script_p2pk_C = Script([pubkey_tr_script_C.to_x_only_hex(), 'OP_CHECKSIG'])
+    tr_script_p2pk_C_B = Script([pubkey_tr_script_C.to_x_only_hex(),'OP_CHECKSIGVERIFY',pubkey_tr_script_B.to_x_only_hex() , 'OP_CHECKSIG'])
+    tr_script_p2pk_A_C = Script([pubkey_tr_script_C.to_x_only_hex(),'OP_CHECKSIGVERIFY',pubkey_tr_script_A.to_x_only_hex() , 'OP_CHECKSIG'])
+    tr_script_p2pk_B_A =Script([pubkey_tr_script_A.to_x_only_hex(),'OP_CHECKSIGVERIFY',pubkey_tr_script_B.to_x_only_hex() , 'OP_CHECKSIG'])
+
 
     # tapleafs in order
     #                  TB_ABC
-    #                  /    \
-    #                 /      \
-    #              TB_AB      \
-    #               / \        \
-    #              /   \        \
-    #            TL_A TL_B     TL_C
-    all_leafs = [ [tr_script_p2pk_A, tr_script_p2pk_B], tr_script_p2pk_C ]
+    #                  /     \
+    #                 /       \
+    #
+    #                /\        \
+    #               /  \        \
+    #              /    \        \
+    #        TL_A_C    TL_B_A    TL_C_B
+    all_leafs = [ [tr_script_p2pk_A_C, tr_script_p2pk_B_A], tr_script_p2pk_C_B ]
 
     # taproot script path address
     to_address = to_pub.get_taproot_address(all_leafs)
