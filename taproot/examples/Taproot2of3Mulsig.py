@@ -4,11 +4,12 @@ from bitcoinutils.script import Script
 from bitcoinutils.transactions import Transaction, TxInput, TxOutput, TxWitnessInput
 from bitcoinutils.hdwallet import HDWallet
 
-from taproot.test_framework.key import generate_key_pair
-from taproot.test_framework.messages import sha256
+from test_framework.key import generate_key_pair
+from test_framework.messages import sha256
 from test_framework.musig import generate_musig_key
 
-def create2of2aggPubkey(privkey1, pubkey1, privkey2, pubkey2):
+
+def create_2of2_agg_pubkey(privkey1, pubkey1, privkey2, pubkey2):
     pubkeys = [pubkey1, pubkey2]
 
     c_map, pubkey_agg = generate_musig_key(pubkeys)
@@ -28,6 +29,7 @@ def create2of2aggPubkey(privkey1, pubkey1, privkey2, pubkey2):
         pubkey_agg.negate()
 
     return pubkey_agg
+
 
 setup('testnet')
 
@@ -74,20 +76,14 @@ to_priv = hdw.get_private_key()
 print('Send to Private key', to_priv.to_wif())
 to_pub = to_priv.get_public_key()
 
-# privkey_tr_script_A = PrivateKey('cSW2kQbqC9zkqagw8oTYKFTozKuZ214zd6CMTDs4V32cMfH3dgKa')
-# pubkey_tr_script_A = privkey_tr_script_A.get_public_key()
-# privkey_tr_script_B = PrivateKey('cSv48xapaqy7fPs8VvoSnxNBNA2jpjcuURRqUENu3WVq6Eh4U3JU')
-# pubkey_tr_script_B = privkey_tr_script_B.get_public_key()
-# privkey_tr_script_C = PrivateKey('cRkZPNnn3jdr64o3PDxNHG68eowDfuCdcyL6nVL4n3czvunuvryC')
-# pubkey_tr_script_C = privkey_tr_script_C.get_public_key()
-
 privkey1, pubkey1 = generate_key_pair(sha256(b'key0'))
 privkey2, pubkey2 = generate_key_pair(sha256(b'key1'))
 privkey3, pubkey3 = generate_key_pair(sha256(b'key2'))
 
-tr_script_p2pk_B_A = Script([create2of2aggPubkey(privkey1, pubkey1, privkey2, pubkey2).get_x(), 'OP_CHECKSIG'])
-tr_script_p2pk_A_C = Script([create2of2aggPubkey(privkey1, pubkey1, privkey3, pubkey3).get_x(), 'OP_CHECKSIG'])
-tr_script_p2pk_C_B = Script([create2of2aggPubkey(privkey3, pubkey3, privkey2, pubkey2).get_x(), 'OP_CHECKSIG'])
+# create 2of2 musig scripts
+tr_script_p2pk_B_A = Script([create_2of2_agg_pubkey(privkey1, pubkey1, privkey2, pubkey2).get_x(), 'OP_CHECKSIG'])
+tr_script_p2pk_A_C = Script([create_2of2_agg_pubkey(privkey1, pubkey1, privkey3, pubkey3).get_x(), 'OP_CHECKSIG'])
+tr_script_p2pk_C_B = Script([create_2of2_agg_pubkey(privkey3, pubkey3, privkey2, pubkey2).get_x(), 'OP_CHECKSIG'])
 
 # tapleafs in order
 #                  TB_ABC

@@ -1,6 +1,6 @@
 import json
 
-from secret import Secret
+from htlc.secret import Secret
 
 
 def build_fund_script(script):
