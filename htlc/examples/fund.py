@@ -5,9 +5,9 @@ from bitcoinutils.utils import to_satoshis
 
 from network import push_tx
 from participant import ALICE, BOB
-from htlc import HTLC
-from secret import Secret
-from utils import build_fund_script, jsonify_htlc
+from htlc.htlc import HTLC
+from htlc.secret import Secret
+from htlc.utils import build_fund_script, jsonify_htlc
 
 END_TIME = int(datetime.now().timestamp()) + 3600  # one hour later
 print('End Time : ', END_TIME)

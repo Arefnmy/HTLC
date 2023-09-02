@@ -5,13 +5,13 @@ from bitcoinutils.utils import to_satoshis
 
 from network import push_tx
 from participant import ALICE, BOB
-from htlc import HTLC
-from secret import Secret
-from utils import build_refund_script
+from htlc.htlc import HTLC
+from htlc.secret import Secret
+from htlc.utils import build_refund_script
 
 TX_ID = 'e6473ae1519a0f41d1618d03b2d7068a98d270988e48709502f003d1a591719d'
 UTXO_INDEX = 0
-AMOUNT = 0.000029
+AMOUNT = 0.00002
 END_TIME = 1692801170
 
 ALICE_SECRET = Secret.from_string('Alice Secret')

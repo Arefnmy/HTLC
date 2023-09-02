@@ -7,11 +7,11 @@ from litecoinutils.script import Script as LTC_Script
 from litecoinutils.transactions import TxInput as LTC_TxInput, Transaction as LTC_Transaction, TxOutput as LTC_TxOutput
 from litecoinutils.utils import to_satoshis as LTC_to_satoshis
 
-from htlc import HTLC, Swap
+from htlc.htlc import HTLC, Swap
 from network import fetch_tx, push_tx
 from participant import ALICE, CAROL
-from secret import Secret
-from utils import build_fund_script, extract_secret, build_withdraw_script
+from htlc.secret import Secret
+from htlc.utils import build_fund_script, extract_secret, build_withdraw_script
 
 # Alice creates HTLC on BTC
 ALICE_END_TIME_HTLC = int(datetime.now().timestamp()) + 3600 * 48  # 48 hours later

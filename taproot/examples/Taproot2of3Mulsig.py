@@ -2,11 +2,10 @@ from bitcoinutils.setup import setup
 from bitcoinutils.utils import to_satoshis
 from bitcoinutils.script import Script
 from bitcoinutils.transactions import Transaction, TxInput, TxOutput, TxWitnessInput
-from bitcoinutils.keys import PrivateKey
 from bitcoinutils.hdwallet import HDWallet
 
-from examples.test_framework.key import generate_key_pair
-from examples.test_framework.messages import sha256
+from taproot.test_framework.key import generate_key_pair
+from taproot.test_framework.messages import sha256
 from test_framework.musig import generate_musig_key
 
 def create2of2aggPubkey(privkey1, pubkey1, privkey2, pubkey2):

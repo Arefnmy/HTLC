@@ -2,11 +2,11 @@ from bitcoinutils.script import Script
 from bitcoinutils.transactions import TxInput, TxOutput, Transaction
 from bitcoinutils.utils import to_satoshis
 
-from examples.participant import ALICE, BOB
-from htlc import HTLC
+from htlc.examples.participant import ALICE, BOB
+from htlc.htlc import HTLC
 from network import push_tx
-from secret import Secret
-from utils import build_withdraw_script
+from htlc.secret import Secret
+from htlc.utils import build_withdraw_script
 
 TX_ID = '0ba41d5e7e500526915b2865e8d154a10e3366eb1069168925f6dd4fe5dcff62'
 UTXO_INDEX = 0
