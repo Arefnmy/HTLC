@@ -1,11 +1,11 @@
 # Atomic Swap 
 
 We have three examples demonstrating how Hash Time Locked Contracts (HTLCs) work with fund, refund, and withdraw transactions. Additionally, we present an atomic swap example involving the exchange of two cryptocurrencies: Bitcoin and Litecoin.
-- **fund** :
+### fund
 
 In this example, Alice initiates a basic transaction by sending 0.09 BTC to Bob's p2sh address. Initially, Alice initializes the HTLC instance with a secret hash and addresses. Subsequently, she initializes the transaction instance with one input and one output. (Assuming the remaining BTC covers fees.) Alice then signs the transaction output and places the hash of the redeem script (initialized during HTLC initiation) in the scriptSig.
 
-The BIP199 HTLC script:
+The [BIP199](https://github.com/bitcoin/bips/blob/master/bip-0199.mediawiki) HTLC script:
 
 `OP_IF 
 [HASHOP] <secret_hash> OP_EQUALVERIFY OP_DUP OP_HASH160 <recipient_address_hash> OP_EQUALVERIFY OP_CHECKSIG
@@ -17,18 +17,19 @@ Here, HASHOP can be either OP_SHA256 or OP_HASH160, and TIMEOUTOP can be either 
 
 Alice's Fund Transaction:
 
-ID : `d6079f263cec46192f1f139de52229925c39e9eda814d67a1307058e10a06edd`
+ID : 
+[c2b631a3da3745c054be46d12b7f2502c534efb82087ddce84cbad1b6c79410e](https://live.blockcypher.com/btc-testnet/tx/0ba41d5e7e500526915b2865e8d154a10e3366eb1069168925f6dd4fe5dcff62)
 
 ScriptPubKey : 
 `OP_HASH160, 78158b1108353ec00ba26ea19009dee5877b3c48, OP_EQUAL`
-- **withdraw** : 
+### withdraw
 
 After Alice creates the fund transaction, Bob possesses the transaction ID and secret hash, enabling him to initiate an HTLC instance for the script. Bob then constructs a transaction with one input and one output that spends Alice's created p2sh transaction output. He signs the transaction input and adds his signature, public key, 0x01 (or OP_1 for OP_IF execution), and secret to the scriptSig. A redeem script is also included.
 
 Bob's Withdraw Transaction:
 
 ID :
-`f02a74982066796c797dc23d6da8315db4997b08b29aeaea4f1654fb69f35d84`
+[ c2b631a3da3745c054be46d12b7f2502c534efb82087ddce84cbad1b6c79410e](https://live.blockcypher.com/btc-testnet/tx/c2b631a3da3745c054be46d12b7f2502c534efb82087ddce84cbad1b6c79410e)
 
 ScriptSig :
 
@@ -36,14 +37,14 @@ ScriptSig :
 70b02494643d5084471db6ed484ef2332477ecaeb7d465b4fd1d096b11eb6da8 OP_1 OP_IF OP_SHA256 401b46728f451291bd78967e1ed0fd380429179650e9d5c365d0a591fdc85850
 OP_EQUALVERIFY OP_DUP OP_HASH160 e4c6ccda88a296d974dd4f0dd2f406f944be3b47
 OP_EQUALVERIFY OP_CHECKSIG OP_ELSE 64d0fc04 OP_CHECKLOCKTIMEVERIFY OP_DROP OP_DUP OP_HASH160 4f5099f0182b8b0d6182275c3c9336b15a596129 OP_EQUALVERIFY OP_CHECKSIG OP_ENDIF`
-- **refund** :
+### refund
 
-Suppose the transaction Alice created has timed out, and she seeks a refund. Alice reinitializes the HTLC instance and utilizes the fund transaction ID to spend the output. According to BIP0065, Alice must set transaction input sequences to values below the maximum (0xffffffff). A suitable choice is 0xfffffffe. The locktime must also be greater than or equal to the endtime specified in the script. Alice sets the locktime equal to the endtime and signs the transaction. She places her signature, public key, an empty byte (or OP_FALSE to reject OP_IF and execute OP_ELSE opcode), and the redeem script in the scriptSig.
+Suppose the transaction Alice created has timed out, and she seeks a refund. Alice reinitializes the HTLC instance and utilizes the fund transaction ID to spend the output. According to [BIP0065](https://github.com/bitcoin/bips/blob/master/bip-0065.mediawiki), Alice must set transaction input sequences to values below the maximum (0xffffffff). A suitable choice is 0xfffffffe. The locktime must also be greater than or equal to the endtime specified in the script. Alice sets the locktime equal to the endtime and signs the transaction. She places her signature, public key, an empty byte (or OP_FALSE to reject OP_IF and execute OP_ELSE opcode), and the redeem script in the scriptSig.
 
 Alice's Refund Transaction:
 
 ID : 
-`b6a5dbc3f7a6b81680f46ca6bc8228ade09fb9ce2ce8ddf5127c6f082ef6c594`
+[a86b69653a57076a1b5fbe1f5553d3cd975f7b2f16c71187b075b35c5e66d7fb](https://live.blockcypher.com/btc-testnet/tx/a86b69653a57076a1b5fbe1f5553d3cd975f7b2f16c71187b075b35c5e66d7fb)
 
 ScriptSig :
 
@@ -51,7 +52,7 @@ ScriptSig :
 02ee13962c2015d5422d9cb0925bfc389c5919d69e675aa2ced02df9b286d43ccd, OP_0, OP_IF, OP_SHA256, 401b46728f451291bd78967e1ed0fd380429179650e9d5c365d0a591fdc85850,
 OP_EQUALVERIFY, OP_DUP, OP_HASH160, 27c8bb725a66355a43c853b6dfe60f4f9b1da28b, OP_EQUALVERIFY, OP_CHECKSIG, OP_ELSE, 64d57ef7, OP_CHECKLOCKTIMEVERIFY, OP_DROP,
 OP_DUP, OP_HASH160, b3b76419217a47a2b7805542e439ca3cde5e5973, OP_EQUALVERIFY, OP_CHECKSIG, OP_ENDIF`
-- **atomic swap** :
+### atomic swap
 
 In this example, Alice wishes to exchange LTC for BTC. Carol desires to swap her LTC for Alice's BTC. Assuming Alice wants to pay 0.01 BTC and receive 3.52 LTC, she starts by considering the secret and initiating an HTLC instance, setting an end time 48 hours later. She then creates a fund transaction on the Bitcoin network similar to the _fund_ example described above.
 
